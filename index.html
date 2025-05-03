@@ -56,7 +56,7 @@
     let currentStep = 'front';
     let useFrontCamera = false;
     let stream = null;
-    let frontFileId = null;
+    let frontFileObject = null;
 
     const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
     const FILE_UPLOAD_URL = 'https://api.baserow.io/api/user-files/upload-file/';
@@ -89,7 +89,7 @@
       return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
     }
 
-    async function uploadImageAndGetFileId(blob) {
+    async function uploadImageAndGetFileObject(blob) {
       const formData = new FormData();
       formData.append('file', blob, 'book.jpg');
 
@@ -103,13 +103,18 @@
 
       if (!uploadRes.ok) throw new Error('File upload failed');
       const uploadData = await uploadRes.json();
-      return uploadData.id;
+
+      return [{
+        name: uploadData.name,
+        visible_name: uploadData.visible_name
+      }];
     }
 
-    async function createRowWithFile(fileId, isFront) {
-      const body = isFront
-        ? { file: [fileId] }
-        : { file: [frontFileId], back_cover: [fileId] };
+    async function createRowWithFiles(frontFile, backFile) {
+      const body = {
+        file: frontFile,
+        back_cover: backFile
+      };
 
       const res = await fetch(CREATE_ROW_URL, {
         method: 'POST',
@@ -133,20 +138,22 @@
       const blob = await captureImage();
 
       try {
-        const fileId = await uploadImageAndGetFileId(blob);
+        const fileObject = await uploadImageAndGetFileObject(blob);
+        scanLine.style.display = 'none';
+
         if (currentStep === 'front') {
-          frontFileId = fileId;
-          await createRowWithFile(fileId, true);
+          frontFileObject = fileObject;
+          status.textContent = 'Front uploaded!';
           nextBtn.style.display = 'inline-block';
         } else {
-          await createRowWithFile(fileId, false);
+          await createRowWithFiles(frontFileObject, fileObject);
+          status.textContent = 'Back uploaded & row saved!';
           finishBtn.style.display = 'inline-block';
         }
-        status.textContent = 'Upload successful!';
+
       } catch (e) {
         status.textContent = 'Upload failed: ' + e.message;
         scanBtn.disabled = false;
-      } finally {
         scanLine.style.display = 'none';
       }
     }
@@ -172,7 +179,7 @@
       initCamera();
     });
 
-    // Init camera on page load
+    // Init camera on load
     initCamera();
   </script>
 </body>
