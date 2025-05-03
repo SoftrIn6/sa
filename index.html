@@ -1,23 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Book Snap App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Two-Step Book Scanner</title>
   <style>
-    video, img { width: 300px; margin: 10px; border: 2px solid #ccc; }
-    button { padding: 10px 20px; margin: 10px; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    .scanner { max-width: 400px; margin: auto; }
+    video, canvas { width: 100%; border: 3px solid #4caf50; border-radius: 10px; }
+    .scan-line {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: limegreen;
+      animation: scan 3s linear forwards;
+      top: 0;
+    }
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    #next, #finish { display: none; margin-top: 20px; }
   </style>
 </head>
 <body>
-  <h2 id="step-title">Step 1: Capture Front Cover</h2>
-  <video id="video" autoplay></video><br>
-  <button id="snap">Snap Photo</button>
-  <div>
-    <img id="preview-front" style="display:none;">
-    <img id="preview-back" style="display:none;">
-  </div>
-  <button id="upload" disabled>Upload to Baserow</button>
 
-  <script src="app.js"></script>
+  <div class="scanner">
+    <h2 id="label">Front Picture</h2>
+    <p id="description">Scan your book to upload to your account.</p>
+    <div style="position: relative;">
+      <video id="video" autoplay playsinline></video>
+      <div id="scan-line" class="scan-line" style="display: none;"></div>
+    </div>
+    <button id="scanBtn">Scan Front Book</button>
+    <button id="next">Next</button>
+    <button id="finish">Finish</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const scanBtn = document.getElementById('scanBtn');
+    const nextBtn = document.getElementById('next');
+    const finishBtn = document.getElementById('finish');
+    const scanLine = document.getElementById('scan-line');
+    const label = document.getElementById('label');
+    const description = document.getElementById('description');
+    const status = document.getElementById('status');
+
+    let currentStep = 'front';
+
+    const BASEROW_API = 'https://api.baserow.io/api/database/rows/table/503285/';
+    const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
+
+    async function initCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Camera access denied. Please allow access to continue.');
+      }
+    }
+
+    function captureImage() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+      return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+    }
+
+    async function uploadToBaserow(imageBlob, isFront = true) {
+      const formData = new FormData();
+      formData.append(isFront ? 'file' : 'back_cover', imageBlob, isFront ? 'front.jpg' : 'back.jpg');
+
+      const response = await fetch(BASEROW_API, {
+        method: 'POST',
+        headers: {
+          'Authorization': TOKEN
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      return await response.json();
+    }
+
+    async function handleScan() {
+      scanBtn.disabled = true;
+      status.textContent = '';
+      scanLine.style.display = 'block';
+
+      // Wait for animation
+      await new Promise(r => setTimeout(r, 3000));
+
+      const blob = await captureImage();
+
+      try {
+        await uploadToBaserow(blob, currentStep === 'front');
+        status.textContent = 'Upload successful!';
+        scanLine.style.display = 'none';
+
+        if (currentStep === 'front') {
+          nextBtn.style.display = 'inline-block';
+        } else {
+          finishBtn.style.display = 'inline-block';
+        }
+      } catch (e) {
+        status.textContent = 'Upload failed.';
+        scanBtn.disabled = false;
+      }
+    }
+
+    scanBtn.addEventListener('click', handleScan);
+
+    nextBtn.addEventListener('click', () => {
+      currentStep = 'back';
+      label.textContent = 'Back Picture';
+      description.textContent = 'Scan the back of your book to upload to your account.';
+      scanBtn.textContent = 'Scan Back Book';
+      scanBtn.disabled = false;
+      nextBtn.style.display = 'none';
+      status.textContent = '';
+    });
+
+    finishBtn.addEventListener('click', () => {
+      document.body.innerHTML = '<h1>All done! ✅</h1>';
+    });
+
+    // Init camera on load
+    initCamera();
+  </script>
 </body>
 </html>
