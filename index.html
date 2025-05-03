@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Snap App</title>
+  <style>
+    video, img { width: 300px; margin: 10px; border: 2px solid #ccc; }
+    button { padding: 10px 20px; margin: 10px; }
+  </style>
+</head>
+<body>
+  <h2 id="step-title">Step 1: Capture Front Cover</h2>
+  <video id="video" autoplay></video><br>
+  <button id="snap">Snap Photo</button>
+  <div>
+    <img id="preview-front" style="display:none;">
+    <img id="preview-back" style="display:none;">
+  </div>
+  <button id="upload" disabled>Upload to Baserow</button>
+
+  <script src="app.js"></script>
+</body>
+</html>
