@@ -7,7 +7,7 @@
   <style>
     body { font-family: sans-serif; text-align: center; padding: 20px; }
     .scanner { max-width: 400px; margin: auto; }
-    video, canvas { width: 100%; border: 3px solid #4caf50; border-radius: 10px; }
+    video { width: 100%; border: 3px solid #4caf50; border-radius: 10px; }
     .scan-line {
       position: absolute;
       width: 100%;
@@ -20,7 +20,8 @@
       0% { top: 0; }
       100% { top: 100%; }
     }
-    #next, #finish { display: none; margin-top: 20px; }
+    button { margin-top: 10px; padding: 10px 20px; }
+    #next, #finish { display: none; }
   </style>
 </head>
 <body>
@@ -28,10 +29,13 @@
   <div class="scanner">
     <h2 id="label">Front Picture</h2>
     <p id="description">Scan your book to upload to your account.</p>
+
     <div style="position: relative;">
       <video id="video" autoplay playsinline></video>
       <div id="scan-line" class="scan-line" style="display: none;"></div>
     </div>
+
+    <button id="switchCamera">Switch Camera</button><br>
     <button id="scanBtn">Scan Front Book</button>
     <button id="next">Next</button>
     <button id="finish">Finish</button>
@@ -44,18 +48,32 @@
     const nextBtn = document.getElementById('next');
     const finishBtn = document.getElementById('finish');
     const scanLine = document.getElementById('scan-line');
+    const switchCameraBtn = document.getElementById('switchCamera');
     const label = document.getElementById('label');
     const description = document.getElementById('description');
     const status = document.getElementById('status');
 
     let currentStep = 'front';
+    let useFrontCamera = false;
+    let stream = null;
+    let frontFileId = null;
 
-    const BASEROW_API = 'https://api.baserow.io/api/database/rows/table/503285/';
     const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
+    const FILE_UPLOAD_URL = 'https://api.baserow.io/api/user-files/upload-file/';
+    const CREATE_ROW_URL = 'https://api.baserow.io/api/database/rows/table/503285/';
 
     async function initCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      const constraints = {
+        video: { facingMode: useFrontCamera ? "user" : "environment" },
+        audio: false
+      };
+
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
       } catch (err) {
         alert('Camera access denied. Please allow access to continue.');
@@ -71,11 +89,11 @@
       return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
     }
 
-    async function uploadToBaserow(imageBlob, isFront = true) {
+    async function uploadImageAndGetFileId(blob) {
       const formData = new FormData();
-      formData.append(isFront ? 'file' : 'back_cover', imageBlob, isFront ? 'front.jpg' : 'back.jpg');
+      formData.append('file', blob, 'book.jpg');
 
-      const response = await fetch(BASEROW_API, {
+      const uploadRes = await fetch(FILE_UPLOAD_URL, {
         method: 'POST',
         headers: {
           'Authorization': TOKEN
@@ -83,11 +101,27 @@
         body: formData
       });
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
+      if (!uploadRes.ok) throw new Error('File upload failed');
+      const uploadData = await uploadRes.json();
+      return uploadData.id;
+    }
 
-      return await response.json();
+    async function createRowWithFile(fileId, isFront) {
+      const body = isFront
+        ? { file: [fileId] }
+        : { file: [frontFileId], back_cover: [fileId] };
+
+      const res = await fetch(CREATE_ROW_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': TOKEN,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) throw new Error('Row creation failed');
+      return await res.json();
     }
 
     async function handleScan() {
@@ -95,24 +129,25 @@
       status.textContent = '';
       scanLine.style.display = 'block';
 
-      // Wait for animation
       await new Promise(r => setTimeout(r, 3000));
-
       const blob = await captureImage();
 
       try {
-        await uploadToBaserow(blob, currentStep === 'front');
-        status.textContent = 'Upload successful!';
-        scanLine.style.display = 'none';
-
+        const fileId = await uploadImageAndGetFileId(blob);
         if (currentStep === 'front') {
+          frontFileId = fileId;
+          await createRowWithFile(fileId, true);
           nextBtn.style.display = 'inline-block';
         } else {
+          await createRowWithFile(fileId, false);
           finishBtn.style.display = 'inline-block';
         }
+        status.textContent = 'Upload successful!';
       } catch (e) {
-        status.textContent = 'Upload failed.';
+        status.textContent = 'Upload failed: ' + e.message;
         scanBtn.disabled = false;
+      } finally {
+        scanLine.style.display = 'none';
       }
     }
 
@@ -129,10 +164,15 @@
     });
 
     finishBtn.addEventListener('click', () => {
-      document.body.innerHTML = '<h1>All done! ✅</h1>';
+      window.location.href = 'https://www.bdf.bv';
     });
 
-    // Init camera on load
+    switchCameraBtn.addEventListener('click', () => {
+      useFrontCamera = !useFrontCamera;
+      initCamera();
+    });
+
+    // Init camera on page load
     initCamera();
   </script>
 </body>
