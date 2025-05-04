@@ -58,8 +58,9 @@
     let stream = null;
     let frontFileObject = null;
 
-    const AIRTABLE_API_URL = 'https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID}'; // Replace with your Base and Table ID
-    const AIRTABLE_API_KEY = 'Bearer pAtiu1RmQAiWY3OPI.02184c1ec0211618bd1f5196023e9e35ca768b72dbe81816f209779fd451a58e'; // Replace with your Airtable Personal Access Token
+    // Replace these with your actual Airtable info
+    const AIRTABLE_API_URL = 'https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID}'; // Replace with your Base and Table IDs
+    const AIRTABLE_API_KEY = 'Bearer patiu1RmQAiWY3OPI.02184c1ec0211618bd1f5196023e9e35ca768b72dbe81816f209779fd451a58e'; // Your Airtable token
 
     async function initCamera() {
       if (stream) {
@@ -95,7 +96,7 @@
       const uploadRes = await fetch('https://api.imgur.com/3/upload', {
         method: 'POST',
         headers: {
-          'Authorization': 'Client-ID YOUR_IMGUR_CLIENT_ID'  // Replace with your Imgur Client ID (if using Imgur)
+          'Authorization': 'Client-ID YOUR_IMGUR_CLIENT_ID'  // Replace with your Imgur Client ID
         },
         body: formData
       });
