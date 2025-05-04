@@ -58,9 +58,8 @@
     let stream = null;
     let frontFileObject = null;
 
-    const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
-    const FILE_UPLOAD_URL = 'https://api.baserow.io/api/user-files/upload-file/';
-    const CREATE_ROW_URL = 'https://api.baserow.io/api/database/rows/table/503285/';
+    const AIRTABLE_API_URL = 'https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID}'; // Replace with your Base and Table ID
+    const AIRTABLE_API_KEY = 'Bearer pAtiu1RmQAiWY3OPI.02184c1ec0211618bd1f5196023e9e35ca768b72dbe81816f209779fd451a58e'; // Replace with your Airtable Personal Access Token
 
     async function initCamera() {
       if (stream) {
@@ -89,14 +88,14 @@
       return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
     }
 
-    async function uploadImageAndGetFileObject(blob) {
+    async function uploadImageToAirtable(blob) {
       const formData = new FormData();
       formData.append('file', blob, 'book.jpg');
 
-      const uploadRes = await fetch(FILE_UPLOAD_URL, {
+      const uploadRes = await fetch('https://api.imgur.com/3/upload', {
         method: 'POST',
         headers: {
-          'Authorization': TOKEN
+          'Authorization': 'Client-ID YOUR_IMGUR_CLIENT_ID'  // Replace with your Imgur Client ID (if using Imgur)
         },
         body: formData
       });
@@ -104,22 +103,23 @@
       if (!uploadRes.ok) throw new Error('File upload failed');
       const uploadData = await uploadRes.json();
 
-      return [{
-        name: uploadData.name,
-        visible_name: uploadData.visible_name
-      }];
+      return {
+        url: uploadData.data.link // This URL will be used in Airtable attachment
+      };
     }
 
-    async function createRowWithFiles(frontFile, backFile) {
+    async function createRowInAirtable(frontFileUrl, backFileUrl) {
       const body = {
-        file: frontFile,
-        back_cover: backFile
+        fields: {
+          'File': [{ url: frontFileUrl }],
+          'Back Cover': [{ url: backFileUrl }]
+        }
       };
 
-      const res = await fetch(CREATE_ROW_URL, {
+      const res = await fetch(AIRTABLE_API_URL, {
         method: 'POST',
         headers: {
-          'Authorization': TOKEN,
+          'Authorization': AIRTABLE_API_KEY,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
@@ -138,15 +138,16 @@
       const blob = await captureImage();
 
       try {
-        const fileObject = await uploadImageAndGetFileObject(blob);
+        const fileUrl = await uploadImageToAirtable(blob);
+
         scanLine.style.display = 'none';
 
         if (currentStep === 'front') {
-          frontFileObject = fileObject;
+          frontFileObject = fileUrl;
           status.textContent = 'Front uploaded!';
           nextBtn.style.display = 'inline-block';
         } else {
-          await createRowWithFiles(frontFileObject, fileObject);
+          await createRowInAirtable(frontFileObject.url, fileUrl.url);
           status.textContent = 'Back uploaded & row saved!';
           finishBtn.style.display = 'inline-block';
         }
