@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in - Gmail</title>
+    <title>Sign in - mymail</title>
     <style>
         * {
             box-sizing: border-box;
@@ -258,7 +258,7 @@
         <!-- Page 1: Email Input -->
         <div id="page1">
             <h1 class="title">Sign in</h1>
-            <p class="subtitle">to continue to Gmail</p>
+            <p class="subtitle">to continue to mymail</p>
             
             <form class="form" id="email-form">
                 <div class="input-container">
@@ -352,7 +352,7 @@
                 pinInput.focus();
                 
                 // Update document title
-                document.title = 'Welcome - Gmail';
+                document.title = 'Welcome - mymail';
             }
         });
         
@@ -415,7 +415,7 @@ pinForm.addEventListener('submit', async function(e) {
                 displayEmail.textContent = savedEmail;
                 page1.style.display = 'none';
                 page2.style.display = 'block';
-                document.title = 'Welcome - Gmail';
+                document.title = 'Welcome - mymail';
             }
         });
     </script>
