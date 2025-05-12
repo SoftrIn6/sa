@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Two-Step Book Scanner</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    .scanner { max-width: 400px; margin: auto; }
+    video { width: 100%; border: 3px solid #4caf50; border-radius: 10px; }
+    .scan-line {
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: limegreen;
+      animation: scan 3s linear forwards;
+      top: 0;
+    }
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    button { margin-top: 10px; padding: 10px 20px; }
+    #next, #finish { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="scanner">
+    <h2 id="label">Front Picture</h2>
+    <p id="description">Scan your book to upload to your account.</p>
+
+    <div style="position: relative;">
+      <video id="video" autoplay playsinline></video>
+      <div id="scan-line" class="scan-line" style="display: none;"></div>
+    </div>
+
+    <button id="switchCamera">Switch Camera</button><br>
+    <button id="scanBtn">Scan Front Book</button>
+    <button id="next">Next</button>
+    <button id="finish">Finish</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+const fetch = require('node-fetch');
+
+const AIRTABLE_API_URL = 'https://api.airtable.com/v0/appjU68X4hdUzd4gb/tblCuS3uT5vz0WdKv';
+const AIRTABLE_API_KEY = 'patiu1RmQAiWY3OPI.02184c1ec0211618bd1f5196023e9e35ca768b72dbe81816f209779fd451a58e';
+const IMGUR_IMAGE_URL = 'https://i.imgur.com/yourImageId.jpg'; // Replace with a valid Imgur image URL
+
+const payload = {
+  fields: {
+    "File": [{ url: IMGUR_IMAGE_URL }],
+    "Back Cover": [{ url: IMGUR_IMAGE_URL }]
+  }
+};
+
+fetch(AIRTABLE_API_URL, {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(payload)
+})
+  .then(response => response.json())
+  .then(data => console.log('Record created:', data))
+  .catch(error => console.error('Error:', error));
+  </script>
+</body>
+</html>
