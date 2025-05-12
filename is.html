@@ -50,6 +50,7 @@
       border-radius: 12px;
       box-shadow: 0 0 10px var(--accent);
       transition: box-shadow var(--transition);
+      background: #000;
     }
     video:focus, video:hover { box-shadow: 0 0 20px var(--accent-2); }
     .scan-line {
@@ -90,27 +91,70 @@
     }
     #switchCamera { background: transparent; color: var(--accent); box-shadow: none; text-decoration: underline; }
     #switchCamera:hover { color: var(--accent-2); }
+    /* Permission overlay */
+    #permissionOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    #permissionOverlay h2 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    #enableBtn {
+      padding: .8rem 1.5rem;
+      font-size: 1rem;
+      color: var(--text-dark);
+      background: linear-gradient(45deg, var(--accent), var(--accent-2));
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,255,255,0.6);
+      transition: transform var(--transition);
+    }
+    #enableBtn:hover { transform: scale(1.1); }
   </style>
 </head>
 <body>
-
-  <div class="scanner">
+  <div id="permissionOverlay">
+    <h2>Allow Camera Access</h2>
+    To Verify Scan Out
+    <button id="enableBtn">Enable Camera</button>
+  </div>
+  <div class="scanner" style="visibility:hidden;">
     <h2 id="label">Front Picture</h2>
     <p id="description">Scan the front of your book to upload to your account.</p>
-
     <div style="position: relative;">
       <video id="video" autoplay playsinline></video>
       <div id="scan-line" class="scan-line" style="display:none;"></div>
     </div>
-
     <button id="switchCamera">Switch Camera</button><br>
-    <button id="scanBtn">Scan Front Book</button>
+    <button id="scanBtn" disabled>Scan Front Book</button>
     <button id="next">Next</button>
     <button id="finish">Finish</button>
     <p id="status"></p>
   </div>
 
   <script>
+    const permissionOverlay = document.getElementById('permissionOverlay');
+    const enableBtn = document.getElementById('enableBtn');
+    const scanner = document.querySelector('.scanner');
+
+    enableBtn.addEventListener('click', () => {
+      initCamera().then(() => {
+        permissionOverlay.style.display = 'none';
+        scanner.style.visibility = 'visible';
+        document.getElementById('scanBtn').disabled = false;
+      }).catch(() => {
+        alert('Camera permission is required.');
+      });
+    });
+
     // DOM refs
     const video      = document.getElementById('video');
     const scanBtn    = document.getElementById('scanBtn');
@@ -122,35 +166,26 @@
     const desc       = document.getElementById('description');
     const status     = document.getElementById('status');
 
-    // State
     let useFrontCamera = false;
     let stream         = null;
     let frontURL       = null;
     let currentStep    = 'front';
 
-    // Baserow config
-    const TABLE_ID    = '503285';
-    const BASEROW_API = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/?user_field_names=true`;
+    const TABLE_ID      = '503285';
+    const BASEROW_API   = `https://api.baserow.io/api/database/rows/table/${TABLE_ID}/?user_field_names=true`;
     const BASEROW_TOKEN = 'Token LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
-
-    // Imgur config
     const IMGUR_CLIENT_ID = 'c16e7b4d4df51fc';
 
-    // init camera
     async function initCamera() {
       if (stream) stream.getTracks().forEach(t => t.stop());
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: useFrontCamera ? 'user' : 'environment' },
-          audio: false
-        });
-        video.srcObject = stream;
-      } catch (e) {
-        alert('Camera access denied.');
-      }
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      if (!devices.some(d => d.kind === 'videoinput')) throw new Error('No camera found');
+      const userMedia = navigator.mediaDevices.getUserMedia({ video: { facingMode: useFrontCamera ? 'user' : 'environment' }, audio: false });
+      stream = await userMedia;
+      video.srcObject = stream;
+      return true;
     }
 
-    // capture current frame
     function captureBlob() {
       const c = document.createElement('canvas');
       c.width  = video.videoWidth;
@@ -159,77 +194,43 @@
       return new Promise(res => c.toBlob(res, 'image/jpeg'));
     }
 
-    // upload to Imgur
     async function uploadToImgur(blob) {
-      const fd = new FormData();
-      fd.append('image', blob);
-      const r = await fetch('https://api.imgur.com/3/upload', {
-        method: 'POST',
-        headers: { Authorization: 'Client-ID ' + IMGUR_CLIENT_ID },
-        body: fd
-      });
+      const fd = new FormData(); fd.append('image', blob);
+      const r = await fetch('https://api.imgur.com/3/upload', { method: 'POST', headers: { Authorization: 'Client-ID ' + IMGUR_CLIENT_ID }, body: fd });
       if (!r.ok) throw new Error('Imgur upload failed');
-      const j = await r.json();
-      return j.data.link;
+      const j = await r.json(); return j.data.link;
     }
 
-    // create Baserow row
     async function createBaserowRow(frontUrl, backUrl) {
       const body = { frontpictur: frontUrl, backpictur: backUrl };
-      const r = await fetch(BASEROW_API, {
-        method: 'POST',
-        headers: { 'Authorization': BASEROW_TOKEN, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
+      const r = await fetch(BASEROW_API, { method: 'POST', headers: { 'Authorization': BASEROW_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       if (!r.ok) throw new Error('Baserow row creation failed');
       return r.json();
     }
 
-    // shared scan handler
     async function handleScan() {
-      scanBtn.disabled = true;
-      status.textContent = '';
-      scanLine.style.display = 'block';
-      await new Promise(r => setTimeout(r, 1500));
+      scanBtn.disabled = true; status.textContent = '';
+      scanLine.style.display = 'block'; await new Promise(r => setTimeout(r, 1500));
       try {
-        const blob = await captureBlob();
-        const url  = await uploadToImgur(blob);
+        const blob = await captureBlob(); const url = await uploadToImgur(blob);
         scanLine.style.display = 'none';
-
         if (currentStep === 'front') {
-          frontURL = url;
-          status.textContent = 'Front image uploaded';
-          nextBtn.style.display = 'inline-block';
+          frontURL = url; status.textContent = 'Front image uploaded'; nextBtn.style.display = 'inline-block';
         } else {
-          status.textContent = 'Uploading back & saving to Baserow…';
-          await createBaserowRow(frontURL, url);
-          status.textContent = '✅ Done!';
-          finishBtn.style.display = 'inline-block';
+          status.textContent = 'Uploading back & saving to Baserow…'; await createBaserowRow(frontURL, url);
+          status.textContent = '✅ Done!'; finishBtn.style.display = 'inline-block';
         }
-      } catch (e) {
-        status.textContent = 'Error: ' + e.message;
-      } finally {
-        scanBtn.disabled = false;
-      }
+      } catch (e) { status.textContent = 'Error: ' + e.message; }
+      finally { scanBtn.disabled = false; }
     }
 
     scanBtn.addEventListener('click', handleScan);
-
     nextBtn.addEventListener('click', () => {
-      currentStep = 'back';
-      label.textContent = 'Back Picture';
-      desc.textContent  = 'Scan the back of your book.';
-      scanBtn.textContent = 'Scan Back Book';
-      nextBtn.style.display = 'none';
-      status.textContent = '';
+      currentStep = 'back'; label.textContent = 'Back Picture'; desc.textContent = 'Scan the back of your book.';
+      scanBtn.textContent = 'Scan Back Book'; nextBtn.style.display = 'none'; status.textContent = '';
     });
-
     finishBtn.addEventListener('click', () => location.reload());
     switchCam.addEventListener('click', () => { useFrontCamera = !useFrontCamera; initCamera(); });
-
-    // startup
-    initCamera();
   </script>
-
 </body>
 </html>
